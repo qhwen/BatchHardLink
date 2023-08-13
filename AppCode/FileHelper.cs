@@ -32,7 +32,8 @@ namespace BatchHardLink.AppCode
         /// </summary>
         /// <param name="sourcePath"></param>
         /// <param name="targetPath"></param>
-        public static void BatchCreateHardLink(string sourcePath, string targetPath,  HashSet<string> exceptPrefix)
+        public static void BatchCreateHardLink(string sourcePath, string targetPath,  
+            HashSet<string> exceptPrefix, long? limitSize)
         {
             var source = new DirectoryInfo(sourcePath);
             if (!source.Exists)
@@ -40,11 +41,12 @@ namespace BatchHardLink.AppCode
                 return;
             }
 
-            CreateInEachDirectory(source, targetPath, exceptPrefix);
+            CreateInEachDirectory(source, targetPath, exceptPrefix, limitSize);
             OpenDirectory(targetPath);
         }
 
-        private static void CreateInEachDirectory(DirectoryInfo source, string targetPath, HashSet<string> exceptPrefix)
+        private static void CreateInEachDirectory(DirectoryInfo source, string targetPath, 
+            HashSet<string> exceptPrefix, long? limitSize)
         {
             var target = new DirectoryInfo(targetPath);
             if (!target.Exists)
@@ -56,6 +58,13 @@ namespace BatchHardLink.AppCode
             {
                 if (exceptPrefix.Count > 0 && exceptPrefix.Contains(item.Extension.ToLower()))
                 {
+                    DoAfterCreate?.Invoke("后缀跳过-"+item.Name);
+                    continue;
+                }
+
+                if (limitSize.HasValue && item.Length < limitSize * 1024)
+                {
+                    DoAfterCreate?.Invoke("大小跳过-" + item.Name + ", 大小:" + item.Length/1024 + "KB");
                     continue;
                 }
 
@@ -65,7 +74,10 @@ namespace BatchHardLink.AppCode
 
             foreach (var directory in source.EnumerateDirectories())
             {
-                CreateInEachDirectory(directory, Path.Combine(targetPath, directory.Name), exceptPrefix);
+                CreateInEachDirectory(directory, 
+                    Path.Combine(targetPath, directory.Name), 
+                    exceptPrefix,
+                    limitSize);
             }
         }
 

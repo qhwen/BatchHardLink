@@ -1,4 +1,5 @@
 using BatchHardLink.AppCode;
+using System.ComponentModel;
 using System.Text;
 
 namespace BatchHardLink
@@ -28,6 +29,7 @@ namespace BatchHardLink
 
         private void button3_Click(object sender, EventArgs e)
         {
+            textBox4.Clear();
             StringBuilder error = new StringBuilder();
             if(!FileHelper.PathCheck(textBox1.Text, textBox2.Text, label3.Text, ref error))
             {
@@ -41,17 +43,31 @@ namespace BatchHardLink
             };
 
             var except = new HashSet<string>() { ".torrent" };
-            if (!string.IsNullOrEmpty(textBox3.Text))
+            if (!string.IsNullOrWhiteSpace(textBox3.Text))
             {
                 except = textBox3.Text.ToLower().Split('.')
                     .Where(i => !string.IsNullOrEmpty(i)).Select(i => "." + i).ToHashSet();
+            }
+
+            long? limitSize = null;
+            if (!string.IsNullOrWhiteSpace(textBox5.Text))
+            {
+                try
+                {
+                    limitSize = Convert.ToInt64(textBox5.Text);
+                }
+                catch (Exception)
+                {
+                    MessageBox.Show("最小限制仅限输入数字");
+                }
             }
 
             var task = Task.Run(()=>
             {
                 try
                 {
-                    FileHelper.BatchCreateHardLink(textBox1.Text, textBox2.Text, except);
+                    FileHelper.BatchCreateHardLink(textBox1.Text, textBox2.Text, 
+                        except, limitSize);
                 }
                 catch (Exception ex)
                 {
@@ -62,6 +78,7 @@ namespace BatchHardLink
                     label3.Text = "";
                 }
             });
+
             label3.Text = "后台创建中，请稍后...";
         }
 
