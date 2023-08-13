@@ -59,6 +59,7 @@ namespace BatchHardLink
                 catch (Exception)
                 {
                     MessageBox.Show("最小限制仅限输入数字");
+                    return;
                 }
             }
 

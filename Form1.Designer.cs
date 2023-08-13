@@ -154,9 +154,10 @@
             // 
             this.textBox5.Location = new System.Drawing.Point(258, 153);
             this.textBox5.Name = "textBox5";
-            this.textBox5.PlaceholderText = "留空复制所有文件";
+            this.textBox5.PlaceholderText = "留空硬链接所有文件";
             this.textBox5.Size = new System.Drawing.Size(123, 23);
             this.textBox5.TabIndex = 11;
+            this.textBox5.Text = "1024";
             // 
             // label5
             // 

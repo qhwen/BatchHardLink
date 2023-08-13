@@ -64,7 +64,8 @@ namespace BatchHardLink.AppCode
 
                 if (limitSize.HasValue && item.Length < limitSize * 1024)
                 {
-                    DoAfterCreate?.Invoke("大小跳过-" + item.Name + ", 大小:" + item.Length/1024 + "KB");
+                    DoAfterCreate?.Invoke("复制文件-" + item.Name + ", 大小:" + item.Length/1024 + "KB");
+                    File.Copy(item.FullName, Path.Combine(targetPath, item.Name), false);
                     continue;
                 }
 
